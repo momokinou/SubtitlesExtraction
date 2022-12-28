@@ -1,5 +1,6 @@
 <script lang="ts">
   import Greet from './lib/Greet.svelte'
+  import SelectFolder from './lib/SelectFolder.svelte';
 </script>
 
 <main class="container">
@@ -23,6 +24,7 @@
 
   <div class="row">
     <Greet />
+    <SelectFolder />
   </div>
 
 
