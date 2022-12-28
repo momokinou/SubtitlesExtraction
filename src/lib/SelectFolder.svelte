@@ -6,7 +6,8 @@
         try {
             const selectedPath = await open({
                 multiple: false,
-                title: "Open Text File"
+                title: "Open Text File",
+                directory: true, // Delete if i want to select files
         });
         console.log(selectedPath);
         } catch(err) {
