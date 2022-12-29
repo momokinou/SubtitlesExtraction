@@ -46,7 +46,7 @@ for element in list_dir_out:
     if element in list_dir_path:
         list_dir_path.remove(element)
 # Je coupe la liste de façons à ne garder que les X premiers éléments
-list_dir_path = list_dir_path[:20]
+list_dir_path = list_dir_path[:5]
 # Parcourez tous les fichiers dans le dossier
 for subdir in list_dir_path:
     for file in os.listdir(path + "\\" + subdir):
