@@ -1,41 +1,28 @@
 <script lang="ts">
-  import Greet from './lib/Greet.svelte'
-  import SelectFolder from './lib/SelectFolder.svelte';
+    import { onMount } from 'svelte'
+    import { themeChange } from 'theme-change'
+    import ThemeSelect from './lib/ThemeSelect.svelte'
+    import './style.css'
+    onMount(() => {
+      themeChange(false)
+    })
 </script>
 
+
 <main class="container">
-  <h1>Welcome to Tauri!</h1>
+  <ThemeSelect />
+  <p>Here's some DaisyUI buttons, yummy!</p>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
-
-  <div class="row">
-    <Greet />
-    <SelectFolder />
-  </div>
-
-
+  <button class="btn">neutral</button>
+  <button class="btn btn-primary">primary</button>
+  <button class="btn btn-secondary">secondary</button>
+  <button class="btn btn-accent">accent</button>
+  <button class="btn btn-ghost">ghost</button>
+  <button class="btn btn-link">link</button>
 </main>
 
-<style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
+<style global lang="postcss">
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
 </style>
