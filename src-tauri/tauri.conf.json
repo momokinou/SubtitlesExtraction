@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "SubtitlesExtraction",
+    "productName": "BatchSub",
     "version": "0.0.0"
   },
   "tauri": {
@@ -65,7 +65,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "SubtitlesExtraction",
+        "title": "BatchSub",
         "width": 800
       }
     ]

@@ -3,15 +3,31 @@
     windows_subsystem = "windows"
 )]
 
+use std::fs;
+use serde_json::json;
+use std::path::Path;
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn liste_fichiers(dossier: &str) -> Vec<String> {
+    let mut chemins = Vec::new();
+
+    // Récupère l'itérable de tous les éléments du dossier
+    for entry in fs::read_dir(dossier).unwrap() {
+        // Récupère le chemin du fichier ou du dossier
+        let entry = entry.unwrap();
+        let chemin = entry.path();
+
+        // Ajoute le chemin du fichier ou du dossier à la liste
+        chemins.push(chemin.to_str().unwrap().to_string());
+    }
+
+    chemins
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![liste_fichiers])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
