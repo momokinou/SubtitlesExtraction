@@ -19,6 +19,13 @@
       },
       "dialog": {
         "all": true
+      },
+      "fs": {
+        "all": true,
+        "scope": ["*"]
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
@@ -36,7 +43,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "subtitlesExtraction",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
