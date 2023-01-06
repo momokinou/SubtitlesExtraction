@@ -8,17 +8,6 @@
   let children: TreeNode[] = [];
   let dossier: string;
 
-  function GetSortOrder(prop) {
-    return function (a, b) {
-      if (a[prop] > b[prop]) {
-        return 1;
-      } else if (a[prop] < b[prop]) {
-        return -1;
-      }
-      return 0;
-    };
-  }
-
   const unsubscribeFolder = folder.subscribe(async (value) => {
     dossier = value.split("\\").pop();
     let truc: TreeNode[] = await invoke("list_subdirectories", {
@@ -26,7 +15,6 @@
       id: 1,
     });
     children = JSON.parse(truc);
-    children.sort(GetSortOrder("id"));
   });
 
   onDestroy(unsubscribeFolder);

@@ -23,31 +23,6 @@ enum Entry {
     },
 }
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn liste_fichiers(dossier: &str, origin: &str) -> Vec<String> {
-    let mut chemins: Vec<String> = Vec::new();
-    // Récupère l'itérable de tous les éléments du dossier
-    for entry in fs::read_dir(dossier).unwrap() {
-        // Récupère le chemin du fichier ou du dossier
-        let entry = entry.unwrap();
-        let chemin = entry.path();
-
-        if entry.path().is_dir() {
-            let tmp = liste_fichiers(
-                &entry.path().into_os_string().into_string().unwrap(),
-                origin,
-            );
-            for entries in tmp {
-                chemins.push(entries.replace(origin, ""));
-            }
-        }
-        // Ajoute le chemin du fichier ou du dossier à la liste
-        chemins.push(chemin.to_str().unwrap().to_string().replace(origin, ""));
-    }
-    chemins
-}
-
 #[tauri::command]
 fn list_subdirectories(dir: &Path, id: i64) -> String {
     let mut idd: i64 = id;
@@ -107,11 +82,7 @@ fn list_files(dir: &Path) -> Vec<String> {
 fn main() {
     tauri::Builder::default()
         .plugin(PluginBuilder::default().build())
-        .invoke_handler(tauri::generate_handler![
-            liste_fichiers,
-            list_subdirectories,
-            list_files
-        ])
+        .invoke_handler(tauri::generate_handler![list_subdirectories, list_files])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
