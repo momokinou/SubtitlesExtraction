@@ -3,9 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use std::fs;
 use std::path::Path;
-use tauri::regex::Regex;
+use std::{cmp::Ordering, fs};
+use tauri::regex::{self, Regex};
 use tauri_plugin_store::PluginBuilder;
 
 //Thanks to Golden_Water. Go see his bilibili profile. (space.bilibili.com/41925356)
@@ -23,28 +23,10 @@ enum Entry {
     },
 }
 
-fn modify_dirs(entry: &mut Entry) {
-    match entry {
-        Entry::Dir { children, .. } => {
-            for child in children {
-                modify_dirs(child);
-            }
-
-            if let Entry::Dir { children, .. } = entry {
-                children.sort();
-            }
-        }
-        Entry::File { .. } => {}
-    }
-}
-
 #[tauri::command]
 fn list_subdirectories(dir: &Path, id: i64) -> String {
     let mut idd: i64 = id;
     let tree: Vec<Entry> = list_subdirectorie(dir, &mut idd);
-    // for entry in &tree {
-    //     // println!("{:?}", entry);
-    // }
     let ret_json = serde_json::to_string_pretty(&tree).unwrap();
     ret_json
 }
@@ -62,6 +44,17 @@ impl FileText for Entry {
     }
 }
 
+fn compare_last_number(a: &str, b: &str, re: &regex::Regex) -> Ordering {
+    // Utilisation de la méthode `find_iter` pour récupérer un iterator sur tous les nombres de chaque chaîne
+    let a_number = re.find_iter(a).last().map(|m| m.as_str()).unwrap_or("");
+    let b_number = re.find_iter(b).last().map(|m| m.as_str()).unwrap_or("");
+
+    // Conversion des nombres en entiers et comparaison
+    let a_int = a_number.parse::<i32>().unwrap_or(0);
+    let b_int = b_number.parse::<i32>().unwrap_or(0);
+    a_int.cmp(&b_int)
+}
+
 //Thanks to Golden_Water. Go see his bilibili profile. (space.bilibili.com/41925356)
 fn list_subdirectorie(dir: &Path, id: &mut i64) -> Vec<Entry> {
     let mut sub_entries = vec![];
@@ -71,7 +64,7 @@ fn list_subdirectorie(dir: &Path, id: &mut i64) -> Vec<Entry> {
         let entry = entry.unwrap();
         let path = entry.path();
         // println!("{:?}", path);
-        let name = path.file_name().unwrap().to_str().unwrap().to_string();
+        let mut name = path.file_name().unwrap().to_str().unwrap().to_string();
 
         if path.is_dir() {
             *id += 1;
@@ -84,23 +77,20 @@ fn list_subdirectorie(dir: &Path, id: &mut i64) -> Vec<Entry> {
             });
         } else {
             *id += 1;
+            name = re
+                .replace_all(&name, |caps: &regex::Captures| {
+                    format!("{:03}", caps[0].parse::<i32>().unwrap())
+                })
+                .to_string();
+
+            println!("{}", name);
             sub_entries.push(Entry::File {
                 text: name,
                 id: *id,
             });
         }
     }
-    sub_entries.sort_by(|a, b| {
-        let a_num: i32 = re
-            .captures(a.file_text())
-            .and_then(|caps| caps.get(1).map(|m| m.as_str().parse().unwrap()))
-            .unwrap_or(std::i32::MAX);
-        let b_num: i32 = re
-            .captures(b.file_text())
-            .and_then(|caps| caps.get(1).map(|m| m.as_str().parse().unwrap()))
-            .unwrap_or(std::i32::MAX);
-        a_num.cmp(&b_num)
-    });
+    sub_entries.sort_by(|a, b| compare_last_number(a.file_text(), b.file_text(), &re));
     sub_entries
 }
 
