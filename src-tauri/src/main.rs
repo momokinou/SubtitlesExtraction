@@ -82,8 +82,6 @@ fn list_subdirectorie(dir: &Path, id: &mut i64) -> Vec<Entry> {
                     format!("{:03}", caps[0].parse::<i32>().unwrap())
                 })
                 .to_string();
-
-            println!("{}", name);
             sub_entries.push(Entry::File {
                 text: name,
                 id: *id,

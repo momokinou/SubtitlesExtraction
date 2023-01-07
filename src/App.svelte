@@ -23,6 +23,7 @@
   import { Router, Link, Route } from "svelte-navigator";
   import Settings from "./routes/Settings.svelte";
   import Index from "./routes/index.svelte";
+  import About from "./routes/about.svelte";
   let isSideNavOpen = false;
   let isOpen2 = false;
 </script>
@@ -41,6 +42,7 @@
           <SideNavLink href="login" text="Link 1" />
           <SideNavLink href="index" text="Link 2" />
           <SideNavLink href="settings" text="Settings" />
+          <SideNavLink href="about" text="About" />
         </SideNavItems>
       </SideNav>
 
@@ -56,6 +58,9 @@
               </Route>
               <Route path="settings">
                 <Settings />
+              </Route>
+              <Route path="about">
+                <About />
               </Route>
             </Column>
           </Row>
