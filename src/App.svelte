@@ -22,8 +22,9 @@
   import SelectFolder from "./lib/components/SelectFolder.svelte";
   import { Router, Link, Route } from "svelte-navigator";
   import Settings from "./routes/Settings.svelte";
-  import Index from "./routes/index.svelte";
+  import ViewFiles from "./routes/viewFiles.svelte";
   import About from "./routes/about.svelte";
+  import ExtractSub from "./routes/ExtractSub.svelte";
   let isSideNavOpen = false;
   let isOpen2 = false;
 </script>
@@ -39,8 +40,9 @@
 
       <SideNav bind:isOpen={isSideNavOpen}>
         <SideNavItems>
-          <SideNavLink href="login" text="Link 1" />
-          <SideNavLink href="index" text="Link 2" />
+          <SideNavLink href="choseDir" text="Chose directory" />
+          <SideNavLink href="viewFiles" text="View Files" />
+          <SideNavLink href="process" text="Extract sub" />
           <SideNavLink href="settings" text="Settings" />
           <SideNavLink href="about" text="About" />
         </SideNavItems>
@@ -50,11 +52,14 @@
         <Grid>
           <Row>
             <Column>
-              <Route path="login">
+              <Route path="choseDir">
                 <SelectFolder />
               </Route>
-              <Route path="index">
-                <Index />
+              <Route path="viewFiles">
+                <ViewFiles />
+              </Route>
+              <Route path="process">
+                <ExtractSub />
               </Route>
               <Route path="settings">
                 <Settings />

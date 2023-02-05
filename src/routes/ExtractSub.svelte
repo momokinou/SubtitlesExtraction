@@ -1,8 +1,13 @@
 <script lang="ts">
   import { open } from "@tauri-apps/api/dialog";
-  import { invoke } from "@tauri-apps/api/tauri";
   import { Button } from "carbon-components-svelte";
-  import { folder, files } from "./store";
+  import { output_folder } from "../lib/components/store";
+
+  let selectedFolder: string;
+
+  output_folder.subscribe((value) => {
+    selectedFolder = value;
+  });
 
   async function setFolder() {
     try {
@@ -11,9 +16,7 @@
         title: "Open Text File",
         directory: true, // Delete if i want to select files
       });
-      folder.set(dossier.toString());
-      let files_list: [] = await invoke("list_files", { dir: dossier });
-      files.set(files_list);
+      output_folder.set(dossier.toString());
     } catch (err) {
       console.log(err);
     }
@@ -21,5 +24,6 @@
 </script>
 
 <div>
-  <Button on:click={setFolder}>Open File Explorer</Button>
+  <Button on:click={setFolder}>Select output Folder</Button>
+  <p>Selected Folder: {selectedFolder}</p>
 </div>
