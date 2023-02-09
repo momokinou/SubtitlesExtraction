@@ -7,14 +7,15 @@
 
   let children: TreeNode[] = [];
   let dossier: string;
-
   const unsubscribeFolder = folder.subscribe(async (value) => {
-    dossier = value.split("\\").pop();
-    let truc: TreeNode[] = await invoke("list_subdirectories", {
-      dir: value,
-      id: 1,
-    });
-    children = JSON.parse(truc);
+    if (value != "null") {
+      dossier = value.split("\\").pop();
+      let truc: TreeNode[] = await invoke("list_subdirectories", {
+        dir: value,
+        id: 1,
+      });
+      children = JSON.parse(truc);
+    }
   });
 
   onDestroy(unsubscribeFolder);

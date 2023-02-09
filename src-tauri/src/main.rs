@@ -59,11 +59,10 @@ fn compare_last_number(a: &str, b: &str, re: &regex::Regex) -> Ordering {
 fn list_subdirectorie(dir: &Path, id: &mut i64) -> Vec<Entry> {
     let mut sub_entries = vec![];
     let re = Regex::new(r"(\d+)").unwrap();
-
     for entry in std::fs::read_dir(dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
-        // println!("{:?}", path);
+
         let mut name = path.file_name().unwrap().to_str().unwrap().to_string();
 
         if path.is_dir() {
