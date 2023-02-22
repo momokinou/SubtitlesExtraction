@@ -4,6 +4,7 @@
 )]
 
 use std::path::Path;
+use std::process::Command;
 use std::{cmp::Ordering, fs};
 use tauri::regex::{self, Regex};
 use tauri_plugin_store::PluginBuilder;
@@ -105,14 +106,49 @@ fn list_files(dir: &Path) -> Vec<String> {
             files.push(path.to_str().unwrap().to_owned());
         }
     }
-
     files
+}
+
+#[tauri::command]
+fn analyze() {
+    let re = Regex::new(r"[\d,]+(.*)").unwrap();
+    let filepath = "C:\\Users\\moric\\Videos\\Anime\\[Anime Time] Chainsaw Man (Season 1) [1080p][HEVC 10bit x265][AAC][Multi Sub] [Batch]\\[Anime Time] Chainsaw Man - 01 [1080p][HEVC 10bit x265][AAC][Multi Sub].mkv";
+    let cmd = Command::new("ffprobe")
+        .args([
+            "-loglevel",
+            "error",
+            "-select_streams",
+            "s",
+            "-show_entries",
+            "stream=index:stream_tags=language",
+            "-of",
+            "csv=p=0",
+            filepath,
+        ])
+        .output()
+        .expect("failed to execute process");
+    let stdout_str = String::from_utf8_lossy(&cmd.stdout);
+    let mut vec: Vec<&str> = stdout_str.split("\r\n").collect();
+    vec.pop();
+    vec = vec
+        .into_iter()
+        .map(|s| {
+            re.captures(s)
+                .and_then(|cap| cap.get(1))
+                .map(|m| m.as_str())
+                .unwrap_or("")
+        })
+        .collect();
 }
 
 fn main() {
     tauri::Builder::default()
         .plugin(PluginBuilder::default().build())
-        .invoke_handler(tauri::generate_handler![list_subdirectories, list_files])
+        .invoke_handler(tauri::generate_handler![
+            list_subdirectories,
+            list_files,
+            analyze
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

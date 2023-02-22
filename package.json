@@ -1,5 +1,5 @@
 {
-  "name": "BatchSub",
+  "name": "batch_sub",
   "private": true,
   "version": "0.0.0",
   "type": "module",

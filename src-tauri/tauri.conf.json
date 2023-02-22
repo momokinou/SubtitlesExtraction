@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "BatchSub",
+    "productName": "batch_sub",
     "version": "0.0.0"
   },
   "tauri": {
@@ -72,7 +72,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "BatchSub",
+        "title": "batch_sub",
         "width": 800
       }
     ]

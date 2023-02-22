@@ -1,11 +1,17 @@
 <script>
+  import { invoke } from "@tauri-apps/api/tauri";
   import {
     Theme,
     RadioButtonGroup,
     RadioButton,
+    RadioButtonSkeleton,
   } from "carbon-components-svelte";
 
   let theme = "white";
+
+  const callRust = () => {
+    invoke("analyze");
+  };
 </script>
 
 <Theme bind:theme persist persistKey="carbon_theme" />
@@ -14,3 +20,4 @@
     <RadioButton labelText={value} {value} />
   {/each}
 </RadioButtonGroup>
+<RadioButtonSkeleton on:click={callRust()} />

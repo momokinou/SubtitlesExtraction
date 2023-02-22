@@ -3,6 +3,7 @@
   import Iframe from "../lib/components/Iframe.svelte";
   let fullSlug;
 
+  
   // export async function load({ page }) {
   //   fullSlug = `${page.params.slug}?${page.query.toString()}`;
   //   return true;
