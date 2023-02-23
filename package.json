@@ -16,16 +16,16 @@
     "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.0",
-    "@tauri-apps/cli": "^1.2.2",
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "@tauri-apps/cli": "^1.2.3",
     "@tsconfig/svelte": "^3.0.0",
-    "@types/node": "^18.7.10",
+    "@types/node": "^18.14.1",
     "carbon-components-svelte": "^0.70.13",
-    "svelte": "^3.54.0",
-    "svelte-check": "^2.10.0",
-    "svelte-preprocess": "^5.0.0",
-    "tslib": "^2.4.1",
-    "typescript": "^4.6.4",
-    "vite": "^4.0.0"
+    "svelte": "^3.55.1",
+    "svelte-check": "^2.10.3",
+    "svelte-preprocess": "^5.0.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.1.4"
   }
 }

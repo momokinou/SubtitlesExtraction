@@ -110,35 +110,38 @@ fn list_files(dir: &Path) -> Vec<String> {
 }
 
 #[tauri::command]
-fn analyze() {
+fn analyze(files: Vec<String>) {
     let re = Regex::new(r"[\d,]+(.*)").unwrap();
-    let filepath = "C:\\Users\\moric\\Videos\\Anime\\[Anime Time] Chainsaw Man (Season 1) [1080p][HEVC 10bit x265][AAC][Multi Sub] [Batch]\\[Anime Time] Chainsaw Man - 01 [1080p][HEVC 10bit x265][AAC][Multi Sub].mkv";
-    let cmd = Command::new("ffprobe")
-        .args([
-            "-loglevel",
-            "error",
-            "-select_streams",
-            "s",
-            "-show_entries",
-            "stream=index:stream_tags=language",
-            "-of",
-            "csv=p=0",
-            filepath,
-        ])
-        .output()
-        .expect("failed to execute process");
-    let stdout_str = String::from_utf8_lossy(&cmd.stdout);
-    let mut vec: Vec<&str> = stdout_str.split("\r\n").collect();
-    vec.pop();
-    vec = vec
-        .into_iter()
-        .map(|s| {
-            re.captures(s)
-                .and_then(|cap| cap.get(1))
-                .map(|m| m.as_str())
-                .unwrap_or("")
-        })
-        .collect();
+
+    for file in files {
+        let cmd = Command::new("ffprobe")
+            .args([
+                "-loglevel",
+                "error",
+                "-select_streams",
+                "s",
+                "-show_entries",
+                "stream=index:stream_tags=title",
+                "-of",
+                "csv=p=0",
+                &file,
+            ])
+            .output()
+            .expect("failed to execute process");
+        let stdout_str = String::from_utf8_lossy(&cmd.stdout);
+        let mut vec: Vec<&str> = stdout_str.split("\r\n").collect();
+        vec.pop();
+        // vec = vec
+        //     .into_iter()
+        //     .map(|s| {
+        //         re.captures(s)
+        //             .and_then(|cap| cap.get(1))
+        //             .map(|m| m.as_str())
+        //             .unwrap_or("")
+        //     })
+        //     .collect();
+        println!("{:?}", vec);
+    }
 }
 
 fn main() {
