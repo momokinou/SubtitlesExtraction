@@ -1,20 +1,30 @@
 from glob import glob
+import json
 import os
 import subprocess
 from langcodes import *
 
 # Définissez le chemin vers le dossier contenant les fichiers .mkv ici
-path = "I:\Anime"
+path = "I:\Anime\A Centaur's Life"
 
 # Définissez le chemin vers le dossier où enregistrer les sous-titres ici
-output_path = "E:\subtitles\\"
+output_path = "E:\\testouput\\"
+
+
+def path_to_dict(path):
+    d = {'text': os.path.basename(path)}
+    if os.path.isdir(path):
+        d['children'] = [path_to_dict(os.path.join(path, x))
+                         for x in os.listdir(path)]
+    return d
+
 
 def fast_scandir(dirname):
-    subfolders=[f.path for f in os.scandir(dirname) if f.is_dir()]
+    subfolders = [f.path for f in os.scandir(dirname) if f.is_dir()]
     for dirname in list(subfolders):
         subfolders.extend(fast_scandir(dirname))
     return subfolders
-    
+
 
 list_dir_path = fast_scandir(path)
 list_dir_out = fast_scandir(output_path)
@@ -45,22 +55,25 @@ for element in list_dir_out:
     # Si l'élément est également présent dans la deuxième liste, supprimez-le de cette dernière
     if element in list_dir_path:
         list_dir_path.remove(element)
+
+# print(json.dumps(path_to_dict(output_path)))
+
 # Je coupe la liste de façons à ne garder que les X premiers éléments
-list_dir_path = list_dir_path[:5]
-# Parcourez tous les fichiers dans le dossier
-for subdir in list_dir_path:
-    for file in os.listdir(path + "\\" + subdir):
+# list_dir_path = list_dir_path[:5]
+if list_dir_path == []:
+    path_to_file = path + "\\"
+    dir_name = path.split("\\").pop()
+    for file in os.listdir(path_to_file):
         # Vérifiez que le fichier est un fichier .mkv
         if file.endswith(".mkv"):
-            path_to_file = path + "\\" + subdir + "\\"
             # Exécutez la commande ffmpeg pour récupérer les informations sur les sous-titres du fichier .mkv
             # command = f"ffmpeg -i \"{os.path.join(path, file)}\" -map 0:s 2>&1"
-            command = f"ffprobe -loglevel error -select_streams s -show_entries stream=index:stream_tags=language -of csv=p=0 \"{os.path.join(path_to_file, file)}\""
+            command = f"ffprobe -loglevel error -select_streams s -show_entries stream=index:stream_tags=title -of csv=p=0 \"{os.path.join(path_to_file, file)}\""
+            # command = f"ffprobe -loglevel 0 -print_format json -show_format -show_streams \"{os.path.join(path_to_file, file)}\"" => Show all informations
             output = subprocess.run(command, shell=True,
                                     capture_output=True).stdout.decode()
             # Séparez la sortie en lignes
             lines = output.split("\n")
-
             # Créez un dictionnaire pour stocker les informations sur les sous-titres
             subtitles = {}
             # Parcourez toutes les lignes de la sortie
@@ -72,28 +85,72 @@ for subdir in list_dir_path:
                     # Ajoutez l'ID et la clé au dictionnaire
                     subtitles[parts[0]] = parts[1].rstrip("\r")
 
-            # Suppression des valeurs en double
-            temp=[]
-            res={}
-            for key,val in subtitles.items():
-                if val not in temp:
-                    temp.append(val)
-                    res[key]=val
-            subtitles = res
-
             # Parcourez tous les sous-titres du fichier .mkv
             for i in subtitles:
                 lang = subtitles[i]
-                name=file.rstrip(".mkv")
-                name=name.replace("&nbsp;", "")
-                name=name.replace("&amp", "")
-                nn= file.split(" É")
-                lang_alpha2 = Language.get(subtitles[i])
-                lang_full = Language.get(lang_alpha2, normalize=False).display_name()
-                dir = output_path + lang_full
-                if not os.path.exists(dir + "\\" + subdir):
-                    os.makedirs(dir + "\\" + subdir)
-                out = dir + "\\" + subdir + "\\"
+                name = file.rstrip(".mkv")
+                name = name.replace("&nbsp;", "")
+                name = name.replace("&amp", "")
+                nn = file.split(" É")
+                # lang_alpha2 = Language.get(subtitles[i])
+                # lang_full = Language.get(
+                #     lang_alpha2, normalize=False).display_name()
+                dir = output_path + subtitles[i] + "\\" + dir_name
+                if not os.path.exists(dir + "\\"):
+                    os.makedirs(dir + "\\")
+                out = dir + "\\"
                 # Exécutez la commande ffmpeg pour extraire le i-ème sous-titre du fichier .mkv
                 command = f"ffmpeg -i \"{os.path.join(path_to_file, file)}\" -map 0:{i} -c:s copy \"{out + name + '_' + lang + '.ass'}\""
                 subprocess.run(command)
+
+else:
+    # Parcourez tous les fichiers dans le dossier
+    for subdir in list_dir_path:
+        for file in os.listdir(path + "\\" + subdir):
+            # Vérifiez que le fichier est un fichier .mkv
+            if file.endswith(".mkv"):
+                path_to_file = path + "\\" + subdir + "\\"
+                # Exécutez la commande ffmpeg pour récupérer les informations sur les sous-titres du fichier .mkv
+                # command = f"ffmpeg -i \"{os.path.join(path, file)}\" -map 0:s 2>&1"
+                command = f"ffprobe -loglevel error -select_streams s -show_entries stream=index:stream_tags=language -of csv=p=0 \"{os.path.join(path_to_file, file)}\""
+                output = subprocess.run(command, shell=True,
+                                        capture_output=True).stdout.decode()
+                # Séparez la sortie en lignes
+                lines = output.split("\n")
+                # Créez un dictionnaire pour stocker les informations sur les sous-titres
+                subtitles = {}
+                # Parcourez toutes les lignes de la sortie
+                for line in lines:
+                    # Séparez la ligne en deux parties : l'ID du sous-titre et la clé (la langue du sous-titre)
+                    parts = line.split(",")
+                    # Si la ligne contient une clé et un ID
+                    if len(parts) == 2:
+                        # Ajoutez l'ID et la clé au dictionnaire
+                        subtitles[parts[0]] = parts[1].rstrip("\r")
+
+                # # Suppression des valeurs en double
+                # temp = []
+                # res = {}
+                # for key, val in subtitles.items():
+                #     if val not in temp:
+                #         temp.append(val)
+                #         res[key] = val
+                # subtitles = res
+
+                # # Parcourez tous les sous-titres du fichier .mkv
+                # for i in subtitles:
+                #     lang = subtitles[i]
+                #     name = file.rstrip(".mkv")
+                #     name = name.replace("&nbsp;", "")
+                #     name = name.replace("&amp", "")
+                #     nn = file.split(" É")
+                #     lang_alpha2 = Language.get(subtitles[i])
+                #     lang_full = Language.get(
+                #         lang_alpha2, normalize=False).display_name()
+                #     dir = output_path + lang_full
+                #     if not os.path.exists(dir + "\\" + subdir):
+                #         os.makedirs(dir + "\\" + subdir)
+                #     out = dir + "\\" + subdir + "\\"
+                #     # Exécutez la commande ffmpeg pour extraire le i-ème sous-titre du fichier .mkv
+                #     # command = f"ffmpeg -i \"{os.path.join(path_to_file, file)}\" -map 0:{i} -c:s copy \"{out + name + '_' + lang + '.ass'}\""
+                #     # subprocess.run(command)
