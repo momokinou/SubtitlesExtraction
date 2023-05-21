@@ -111,7 +111,7 @@ fn list_files(dir: &Path) -> Vec<String> {
 
 #[tauri::command]
 fn analyze(files: Vec<String>) {
-    let re = Regex::new(r"[\d,]+(.*)").unwrap();
+    // let re: Regex = Regex::new(r"[\d,]+(.*)").unwrap();
 
     for file in files {
         let cmd = Command::new("ffprobe")
